@@ -115,9 +115,13 @@ def main():
     prices = yaml.safe_load((ROOT / "prices.yaml").read_text(encoding="utf-8"))
     s = build_summary(counts_doc, prices)
     # A few parallel FLORES sentences (CC BY-SA 4.0) as calculator samples.
+    # Without the (gitignored) FLORES download, reuse the samples already in summary.json.
     from .measure import load_corpus
-    s["samples"] = {l: "\n".join(load_corpus(l).splitlines()[1:4])
-                    for l in ["eng_Latn", "tel_Telu", "hin_Deva", "tam_Taml", "amh_Ethi", "mya_Mymr", "zho_Hans"]}
+    try:
+        s["samples"] = {l: "\n".join(load_corpus(l).splitlines()[1:4])
+                        for l in ["eng_Latn", "tel_Telu", "hin_Deva", "tam_Taml", "amh_Ethi", "mya_Mymr", "zho_Hans"]}
+    except FileNotFoundError:
+        s["samples"] = json.loads((ROOT / "results" / "summary.json").read_text(encoding="utf-8"))["samples"]
     (ROOT / "results" / "summary.json").write_text(json.dumps(s, indent=1, ensure_ascii=False), encoding="utf-8")
     (ROOT / "site" / "data.js").write_text("window.TOKEN_TAX = " + json.dumps(s, ensure_ascii=False) + ";\n",
                                            encoding="utf-8")

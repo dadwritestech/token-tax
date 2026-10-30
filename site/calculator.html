@@ -142,9 +142,9 @@ async function run() {
       `<td>${(r.n / min).toFixed(2)}×</td><td>${lang === EN ? "—" : Math.round(enEq).toLocaleString() + " tok"}</td><td>${prem.toFixed(2)}×</td><td style="text-align:left;white-space:normal;min-width:220px">${costs}</td></tr>`;
   }
   document.getElementById("out").innerHTML = h;
-  document.getElementById("note").textContent =
+  document.getElementById("note").innerHTML =
     `"Same content in English" divides your count by the ${L[lang].name} premium measured on FLORES-200 for that tokenizer; it is an estimate for your text, the premium itself is measured. ` +
-    `"1M such texts" = tokens × input $/1M tokens from prices.yaml (checked ${D.meta.prices_checked}). Claude and Gemini need API keys and are not shown.`;
+    `"1M such texts" = tokens × input $/1M tokens from prices.yaml (checked ${D.meta.prices_checked}). Claude and Gemini need API keys and are not shown (<a href=\"https://github.com/dadwritestech/token-tax/blob/main/CONTRIBUTING.md\">PRs welcome</a>).`;
 }
 run();
 </script>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>token-tax: what Telugu pays per tokenizer</title>
+<!-- 1280x640 card used for docs/social.png (GitHub social preview) and the README hero.
+     Rendered by scripts/screenshot.py from the same data.js as the site. -->
+<style>
+:root { --surface: #fcfcfb; --hair: #e4e2dc; --ink: #0b0b0b; --ink2: #52514e; --muted: #77756f; --s1: #2a78d6; --ref: #0b0b0b; }
+* { box-sizing: border-box; }
+body { margin: 0; width: 1280px; height: 640px; background: var(--surface); color: var(--ink);
+       font: 18px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; }
+.wrap { padding: 44px 56px 0; }
+h1 { font-size: 46px; line-height: 1.08; margin: 0; letter-spacing: -0.02em; max-width: 1170px; }
+h1 em { font-style: normal; color: var(--ink2); }
+.sub { color: var(--ink2); font-size: 19px; margin: 12px 0 18px; }
+.brand { position: absolute; left: 56px; bottom: 26px; font-size: 17px; color: var(--muted); }
+.brand b { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="h"></h1>
+  <p class="sub" id="sub"></p>
+  <svg id="chart" width="1168" height="330"></svg>
+</div>
+<div class="brand"><b>token-tax</b> · github.com/dadwritestech/token-tax · FLORES-200, 48 languages, 21 tokenizers</div>
+<script src="data.js"></script>
+<script>
+const D = window.TOKEN_TAX, LANG = "tel_Telu";
+// One bar per distinct tokenizer, Telugu premium, sorted. Short names fit the card.
+const short = { "openai-o200k": "o200k (GPT-5.x)", "openai-cl100k": "cl100k (GPT-4)", "mistral-tekken": "Mistral Tekken",
+  "mistral-7b": "Mistral 7B", "bloom": "BLOOM", "sarvam-1": "Sarvam-1" };
+const rows = D.tokenizers.map(t => ({ id: t.id, name: short[t.id] || t.label.replace(/ \(.*\)$/, ""), p: t.premium[LANG] }))
+  .filter(r => !["gemma-3"].includes(r.id)) // Gemma 3 = Gemma 4 within 3 tokens
+  .sort((a, b) => b.p - a.p);
+const worst = rows[0], o200 = rows.find(r => r.id === "openai-o200k");
+document.getElementById("h").innerHTML = `The same paragraph costs <em>$1.00 in English</em>, $${worst.p.toFixed(2)} in Telugu on ${worst.name}.`;
+document.getElementById("sub").textContent =
+  `Telugu's token premium over English for identical content, by tokenizer. On GPT-5.x it is ${o200.p.toFixed(2)}×; the best is ${rows.at(-1).p.toFixed(2)}×. Price per token is the same in every language, so tokens are the bill.`;
+
+const svg = document.getElementById("chart"), NS = "http://www.w3.org/2000/svg";
+const W = 1168, H = 330, padT = 26, labH = 74, n = rows.length, gap = 8;
+const plotW = W - 92, bw = (plotW - gap * (n - 1)) / n, max = Math.ceil(worst.p), y = v => padT + (H - padT - labH) * (1 - v / max);
+const el = (tag, a, txt) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; svg.appendChild(e); return e; };
+for (let v = 2; v <= max; v += 2) {
+  el("line", { x1: 0, x2: plotW, y1: y(v), y2: y(v), stroke: "#e4e2dc" });
+}
+rows.forEach((r, i) => {
+  const x = i * (bw + gap), yt = y(r.p), base = y(0), rad = 4;
+  // bar with 4px rounded data-end, square at the baseline
+  el("path", { d: `M${x},${base} V${yt + rad} Q${x},${yt} ${x + rad},${yt} H${x + bw - rad} Q${x + bw},${yt} ${x + bw},${yt + rad} V${base} Z`,
+               fill: "#2a78d6" });
+  el("text", { x: x + bw / 2, y: yt - 7, "text-anchor": "middle", "font-size": 17, "font-weight": 600, fill: "#0b0b0b" }, r.p.toFixed(2) + "×");
+  const words = r.name.split(" "), lines = [];
+  for (const w of words) { const l = lines.at(-1); if (l && (l + " " + w).length <= 9) lines[lines.length - 1] = l + " " + w; else lines.push(w); }
+  lines.slice(0, 3).forEach((l, k) => el("text", { x: x + bw / 2, y: base + 20 + k * 18, "text-anchor": "middle", "font-size": 14.5, fill: "#52514e" }, l));
+});
+// English reference rule at 1x
+el("line", { x1: 0, x2: plotW + 6, y1: y(1), y2: y(1), stroke: "#0b0b0b", "stroke-width": 1.5, "stroke-dasharray": "5 4" });
+el("text", { x: plotW + 12, y: y(1) + 5, "font-size": 14, fill: "#0b0b0b" }, "English 1×");
+</script>
+</body>
+</html>

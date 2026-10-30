@@ -1,14 +1,22 @@
 # token-tax
 
-**The same paragraph costs $1.00 in English, $1.93 in Telugu and $5.81 in Amharic on GPT-5.x. On Llama 3 it costs $8.29 in Telugu and $11.65 in Burmese.**
+**English** · [తెలుగు](README.te.md) · [हिन्दी](README.hi.md)
 
-LLM APIs bill per token, and a tokenizer turns the same meaning into very different numbers of tokens depending on the language. token-tax measures that gap for 21 real tokenizers (16 distinct ones) across 48 languages. It uses one parallel corpus and the vendors' named tokenizers, with dated prices. It is the 2023 tokenizer-fairness result ([Petrov et al., NeurIPS 2023](https://arxiv.org/abs/2305.15425)), priced and kept current.
+**The same paragraph costs $1.00 in English and $8.29 in Telugu on Llama 3. On GPT-5.x it is $1.93 in Telugu and $5.81 in Amharic.**
 
-![headline](docs/headline-light.png)
+![Telugu's token premium over English for 15 tokenizers, from 8.29× on Llama 3 down to 1.15× on Sarvam-1](docs/hero.png)
 
-- **Charts:** `site/index.html` (headline, bars, every-tokenizer × every-language heatmap, model price table)
-- **Calculator:** `site/calculator.html`. Paste your own text; the real tokenizers run in your browser and nothing is sent anywhere.
-- **No LLM inference anywhere.** Only tokenizers.
+LLM APIs bill per token, and a tokenizer turns the same meaning into very different numbers of tokens depending on the language. token-tax measures that gap for **21 named tokenizers across 48 languages** on one parallel corpus (FLORES-200), then prices it with a dated price sheet. It is the 2023 tokenizer-fairness result ([Petrov et al., NeurIPS 2023](https://arxiv.org/abs/2305.15425)), with dollar figures and current models. No LLM inference anywhere, only tokenizers.
+
+**Try it:** paste your own text into the [calculator](https://dadwritestech.github.io/token-tax/calculator.html). It runs the real tokenizers in your browser and your text never leaves the page. The [charts](https://dadwritestech.github.io/token-tax/) cover every tokenizer × every language.
+
+Or locally (no install; the results are committed):
+
+```bash
+git clone https://github.com/dadwritestech/token-tax && python -m http.server 8791 --directory token-tax/site
+```
+
+Then open http://localhost:8791.
 
 ## Headline numbers
 
@@ -32,6 +40,8 @@ Measured 2026-10-30 on FLORES-200 devtest (1,012 sentences with the same meaning
 | Mistral 7B (2023 SentencePiece) | 6.89× | 4.37× | 5.61× | 6.18× | 2.76× | 7.85× | 3.33× | 1.55× | 1.56× | 3.45× | Odia 11.5× |
 | OpenAI cl100k (GPT-4, GPT-3.5) (= Phi-4, OLMo-2) | 8.28× | 4.78× | 7.64× | 7.63× | 2.93× | 11.65× | 3.03× | 1.87× | 1.59× | 3.81× | Odia 12.5× |
 | Falcon 3 | 8.04× | 4.70× | 8.24× | 5.79× | 3.04× | 11.22× | 3.26× | 1.98× | 1.81× | 4.07× | Kannada 12.8× |
+| Anthropic Claude | *needs API key, [PRs welcome](CONTRIBUTING.md)* | | | | | | | | | | |
+| Google Gemini | *needs API key, [PRs welcome](CONTRIBUTING.md)* | | | | | | | | | | |
 
 All 48 languages, with tokens per word and per character, are in `results/summary.json`.
 
@@ -67,12 +77,13 @@ Input $ per 1M **English-equivalent words**: the price of content whose English 
 | qwen3-235b-a22b-2507 | $0.11 | $0.79 | $0.50 | $0.69 | $0.46 | $1.02 | $0.18 | $0.11 | 262,144 tok → 29,723 (vs 207,819 English) |
 | gemma-4-31b | $0.26 | $0.45 | $0.33 | $0.37 | $0.49 | $0.61 | $0.37 | $0.28 | 262,144 tok → 116,789 (vs 204,132 English) |
 | phi-4 | $0.09 | $0.72 | $0.42 | $0.66 | $0.66 | $1.01 | $0.26 | $0.16 | 16,384 tok → 1,593 (vs 13,198 English) |
+| Claude, Gemini | *needs API key, [PRs welcome](CONTRIBUTING.md)* | | | | | | | | |
 
 The **effective context window** shrinks by the same factor. GLM-5's 204,800-token window holds about 165k English-equivalent words of English but only about 20k of Telugu. Output prices and native-word context (for spaced scripts) are in `results/summary.json`.
 
-### Not measured: Claude, Gemini, GPT-6
+### Not measured: Claude, Gemini, GPT-6 (needs API key, PRs welcome)
 
-Anthropic and Google don't publish their tokenizers; the only way to count tokens is their APIs. Those rows are **empty slots, not estimates**. To fill them, set the key(s) and run:
+Anthropic and Google don't publish their tokenizers; the only way to count tokens is their APIs. Those rows are **empty slots, not estimates**. If you have a key, a PR with the measured counts is very welcome (see [CONTRIBUTING.md](CONTRIBUTING.md)). Set the key(s) and run:
 
 ```bash
 ANTHROPIC_API_KEY=... GEMINI_API_KEY=... python -m tokentax.measure --api && python -m tokentax.report
@@ -135,10 +146,38 @@ python -m pytest
 python -m http.server 8791 --directory site
 ```
 
-Measuring needs about 1 GB of Hugging Face downloads (tokenizer files only, cached in `.hfcache/`). `scripts/screenshot.py` re-renders `docs/` with Playwright.
+`python -m tokentax.report` works on a fresh clone without the corpus (it reuses the committed counts and samples). Re-measuring needs about 1 GB of Hugging Face downloads (tokenizer files only, cached in `.hfcache/`). `scripts/screenshot.py` re-renders `docs/` with Playwright.
 
 ## Limitations (v0)
 
 - **Input side only.** The headline compares input tokens. Output tokens carry the same premium, and output prices are in `summary.json`.
 - **FLORES is formal, translated news and wiki text.** Chat, code-mixed text (Hinglish, Tenglish) and romanised scripts will tokenise differently. Use the calculator for your own text.
+- **Newer releases aren't measured yet.** OpenRouter already lists GPT-6.x and GLM-5.1–5.3. v0 measures one tokenizer per family where the tokenizer is published, and adding the newer ones is a registry entry plus a rerun.
+- **Some vendors don't name their tokenizer.** The OpenAI rows rely on tiktoken's model → encoding map. The Llama 3 and Gemma 3 rows come from mirrors of gated repos; the files are identical, but they aren't the originals.
 - **The premium covers tokens only.** It says nothing about the quality a model delivers in that language.
+
+## License
+
+Code and data are licensed separately, so that anyone who reuses the numbers credits the source:
+
+- **Code** (`tokentax/`, `scripts/`, `site/*.html`, tests): [Apache-2.0](LICENSE).
+- **Numbers and charts** (`results/`, `prices.yaml`, `docs/*.png`, `site/data.js`): [CC BY 4.0](DATA_LICENSE). Reuse them anywhere, commercially too; credit "token-tax by dadwritestech" with a link, or cite [CITATION.cff](CITATION.cff).
+- **Third-party material keeps its own terms:**
+  - The FLORES-200 sample sentences shown in the calculator are CC BY-SA 4.0 (NLLB Team, Meta AI). The corpus itself is not redistributed.
+  - `data/raw/openrouter/models.json` is an excerpt of OpenRouter's public model list, kept only as price provenance.
+
+## Citation
+
+```bibtex
+@misc{tokentax2026,
+  title  = {token-tax: what each language pays per tokenizer, priced},
+  author = {dadwritestech},
+  year   = {2026},
+  url    = {https://github.com/dadwritestech/token-tax}
+}
+```
+
+## More from dadwritestech
+
+- [thisisfine](https://github.com/dadwritestech/thisisfine): locks what you said yes to into browser checks your coding agent can't quietly break.
+- [LlamaForge](https://github.com/dadwritestech/LlamaForge): an open-source control panel for llama.cpp. It shows where a model lands in VRAM before you load it.

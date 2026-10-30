@@ -1,0 +1,20 @@
+name: Price changed
+description: A price in prices.yaml is out of date.
+labels: [prices]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Model id (as in prices.yaml)
+    validations: {required: true}
+  - type: input
+    id: price
+    attributes:
+      label: New input / output price, USD per 1M tokens
+      placeholder: "2.50 / 15.00"
+    validations: {required: true}
+  - type: input
+    id: url
+    attributes:
+      label: Official pricing page
+    validations: {required: true}

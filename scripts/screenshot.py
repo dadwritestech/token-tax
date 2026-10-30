@@ -20,5 +20,12 @@ with sync_playwright() as p:
     pg.goto(f"{BASE}/calculator.html")
     pg.wait_for_function("document.querySelectorAll('#out tr').length > 8", timeout=120000)
     pg.screenshot(path=f"{OUT}/calculator.png", full_page=True)
+    # 1280x640 card: GitHub social preview (1x, <1 MB) and the README hero (2x).
+    for scale, name in ((1, "social"), (2, "hero")):
+        pg = b.new_page(viewport={"width": 1280, "height": 640}, device_scale_factor=scale, color_scheme="light")
+        pg.goto(f"{BASE}/social.html")
+        pg.wait_for_timeout(300)
+        pg.screenshot(path=f"{OUT}/{name}.png")
+        pg.close()
     b.close()
 print("ok")

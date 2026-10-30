@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use these numbers or charts, please cite token-tax."
+title: "token-tax: what each language pays per tokenizer, priced"
+abstract: >-
+  Token premium versus English for 48 languages across 21 named LLM
+  tokenizers, measured on the parallel FLORES-200 devtest set, and converted
+  to dollars and effective context window with a dated price sheet.
+type: dataset
+authors:
+  - alias: dadwritestech
+repository-code: "https://github.com/dadwritestech/token-tax"
+url: "https://dadwritestech.github.io/token-tax/"
+license: CC-BY-4.0
+version: "0.1.0"
+date-released: "2026-11-03"
+keywords:
+  - tokenization
+  - tokenizer fairness
+  - multilingual
+  - LLM pricing
+  - FLORES-200
+references:
+  - type: conference-paper
+    title: "Language Model Tokenizers Introduce Unfairness Between Languages"
+    authors:
+      - family-names: Petrov
+        given-names: Aleksandar
+      - family-names: La Malfa
+        given-names: Emanuele
+      - family-names: Torr
+        given-names: Philip H. S.
+      - family-names: Bibi
+        given-names: Adel
+    collection-title: "Advances in Neural Information Processing Systems 36 (NeurIPS 2023)"
+    year: 2023
+    url: "https://arxiv.org/abs/2305.15425"
+  - type: article
+    title: "No Language Left Behind: Scaling Human-Centered Machine Translation"
+    authors:
+      - name: "NLLB Team"
+    year: 2022
+    url: "https://arxiv.org/abs/2207.04672"
+    notes: "Source of the FLORES-200 evaluation set (CC BY-SA 4.0)."

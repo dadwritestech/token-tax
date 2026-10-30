@@ -1,0 +1,22 @@
+name: A number looks wrong
+description: A premium, cost or context figure that does not match what you measured.
+labels: [data]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: README table, chart, calculator, or results/summary.json key.
+    validations: {required: true}
+  - type: input
+    id: tokenizer
+    attributes:
+      label: Tokenizer / model and language
+      placeholder: "llama-3, Telugu"
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you measured instead, and how
+      description: Code or command you ran, library versions, and the text you counted (FLORES devtest or your own).
+    validations: {required: true}

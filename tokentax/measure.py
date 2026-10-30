@@ -64,7 +64,7 @@ def count_via_api(key: str, text: str) -> int:  # pragma: no cover - needs keys
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", nargs="*", help="tokenizer ids to (re)measure")
+    ap.add_argument("--only", nargs="*", help="tokenizer ids to (re)measure; none = skip local tokenizers")
     ap.add_argument("--api", action="store_true", help="also measure API-only vendors whose key env var is set")
     ap.add_argument("--raw", action="store_true", help="skip quote cleaning (to measure the FLORES artifact)")
     ap.add_argument("--out", default=str(ROOT / "results" / "counts.json"))
@@ -79,7 +79,8 @@ def main(argv=None):
     data["meta"] = {"corpus": "FLORES-200 devtest (1012 sentences)", "cleaned": not args.raw,
                     "measured": dt.date.today().isoformat()}
 
-    for tid in args.only or list(TOKENIZERS):
+    # `--only` with no ids measures no local tokenizer (useful with --api).
+    for tid in list(TOKENIZERS) if args.only is None else args.only:
         spec = TOKENIZERS[tid]
         print(f"{tid:20s} {spec['name']}", file=sys.stderr, flush=True)
         n = load_tokenizer(spec)

@@ -1,0 +1,26 @@
+name: Add a tokenizer or model
+description: Request (or offer to add) a tokenizer that is not measured yet.
+labels: [tokenizer]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Model / tokenizer
+      placeholder: "GLM-5.2"
+    validations: {required: true}
+  - type: input
+    id: source
+    attributes:
+      label: Public source
+      description: tiktoken encoding name, or a Hugging Face repo with tokenizer.json. Ungated if possible. For Claude/Gemini, "count-tokens API".
+    validations: {required: true}
+  - type: input
+    id: pricing
+    attributes:
+      label: Pricing page (if it should appear in the cost table)
+  - type: checkboxes
+    id: pr
+    attributes:
+      label: Contribution
+      options:
+        - label: I can open the PR myself (see CONTRIBUTING.md)

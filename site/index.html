@@ -226,7 +226,7 @@ function renderModels() {
   }
   document.getElementById("models").innerHTML = h;
   const pend = D.models.filter(m => !m.measured).map(m => `${m.vendor} ${m.id}`);
-  document.getElementById("pending").innerHTML = `<span class="pending">Not measured, deliberately not estimated: ${pend.join(", ")}. Claude and Gemini tokenizers are only reachable via their count-tokens APIs; GPT-6's tokenizer is not published in tiktoken.</span>`;
+  document.getElementById("pending").innerHTML = `<span class="pending">Not measured, deliberately not estimated: ${pend.join(", ")}. Claude and Gemini tokenizers are only reachable through their count-tokens APIs: <b>needs an API key, <a href="https://github.com/dadwritestech/token-tax/blob/main/CONTRIBUTING.md">PRs welcome</a></b>. GPT-6's tokenizer is not published in tiktoken.</span>`;
 }
 
 function renderTable(t) {
@@ -236,7 +236,7 @@ function renderTable(t) {
   document.getElementById("tbl").innerHTML = h;
 }
 
-document.getElementById("foot").innerHTML = `Corpus: ${D.meta.corpus}, CSV-doubled quotes collapsed (changes counts by ≤0.1%). Measured ${D.meta.measured}. Tokenizers loaded from public tokenizer.json / tiktoken files; nothing here is an estimate. Data: FLORES-200 (CC BY-SA 4.0).`;
+document.getElementById("foot").innerHTML = `Corpus: ${D.meta.corpus}, CSV-doubled quotes collapsed (changes counts by ≤0.1%). Measured ${D.meta.measured}. Tokenizers loaded from public tokenizer.json / tiktoken files; nothing here is an estimate. Corpus: FLORES-200 (CC BY-SA 4.0). Numbers and charts CC BY 4.0, code Apache-2.0. <a href="https://github.com/dadwritestech/token-tax">Source, method and limits on GitHub</a> · <a href="calculator.html">calculator</a>.`;
 render(); renderHeat(); renderModels();
 addEventListener("resize", () => renderBars(byId[sel.value]));
 </script>
