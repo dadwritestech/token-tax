@@ -1,0 +1,6 @@
+.hfcache/
+data/raw/flores200.tar.gz
+data/raw/flores200_dataset/
+__pycache__/
+.pytest_cache/
+node_modules/

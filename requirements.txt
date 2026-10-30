@@ -1,0 +1,6 @@
+tiktoken>=0.14
+tokenizers>=0.22
+huggingface_hub>=1.0
+pyyaml
+pytest
+playwright  # only for scripts/screenshot.py

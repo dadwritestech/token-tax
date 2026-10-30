@@ -1,0 +1,68 @@
+# token-tax price sheet. USD per 1M tokens, standard tier, no caching/batch discounts.
+# Every entry carries the page it was read from and the date it was checked.
+# Prices change: edit this file, rerun `python -m tokentax.report`, and commit, so the
+# git history keeps the dated price record.
+#
+# `tokenizer` must be a key in tokentax/registry.py TOKENIZERS (measured locally) or
+# API_ONLY (measured only when an API key is present; NEVER estimated).
+# Open-weight models are served by many hosts at different prices; for those we use
+# OpenRouter's listed price (snapshot: data/raw/openrouter/models.json) unless the
+# model's own lab sells it first-party.
+
+checked: 2026-10-30
+
+models:
+  # --- OpenAI (first-party). tiktoken maps every "gpt-5*" and "gpt-4.1/4o" model to o200k_base.
+  - {id: gpt-5.5, vendor: OpenAI, tokenizer: openai-o200k, input: 5.00, output: 30.00, context: 1050000,
+     source: "https://developers.openai.com/api/docs/pricing", context_source: "https://openrouter.ai/api/v1/models",
+     note: "<272K-context tier; tokenizer per tiktoken 0.14 model map (gpt-5 prefix)"}
+  - {id: gpt-5.4, vendor: OpenAI, tokenizer: openai-o200k, input: 2.50, output: 15.00, context: 1050000,
+     source: "https://developers.openai.com/api/docs/pricing", context_source: "https://openrouter.ai/api/v1/models",
+     note: "<272K-context tier; tokenizer per tiktoken 0.14 model map (gpt-5 prefix)"}
+  - {id: gpt-5-mini, vendor: OpenAI, tokenizer: openai-o200k, input: 0.25, output: 2.00, context: 400000,
+     source: "https://developers.openai.com/api/docs/pricing", context_source: "https://openrouter.ai/api/v1/models"}
+  - {id: gpt-4.1, vendor: OpenAI, tokenizer: openai-o200k, input: 2.00, output: 8.00, context: 1047576,
+     source: "https://developers.openai.com/api/docs/pricing", context_source: "https://openrouter.ai/api/v1/models"}
+  - {id: gpt-4o-mini, vendor: OpenAI, tokenizer: openai-o200k, input: 0.15, output: 0.60, context: 128000,
+     source: "https://developers.openai.com/api/docs/pricing", context_source: "https://openrouter.ai/api/v1/models"}
+  - {id: gpt-3.5-turbo, vendor: OpenAI, tokenizer: openai-cl100k, input: 0.50, output: 1.50, context: 16385,
+     source: "https://developers.openai.com/api/docs/pricing", note: "legacy; shows how bad cl100k was"}
+
+  # --- DeepSeek (first-party). Page lists off-peak/peak; peak (the higher) used.
+  - {id: deepseek-v4-pro, vendor: DeepSeek, tokenizer: deepseek-v4, input: 1.32, output: 3.96, context: 1000000,
+     source: "https://api-docs.deepseek.com/quick_start/pricing", note: "peak rate; off-peak is half"}
+
+  # --- Mistral (first-party pricing page names only Mistral Large's price).
+  - {id: mistral-large-3, vendor: Mistral, tokenizer: mistral-large-3, input: 0.50, output: 1.50, context: 262144,
+     source: "https://mistral.ai/pricing", context_source: "https://openrouter.ai/api/v1/models",
+     note: "page says 'Mistral Large'; OpenRouter lists the same price for mistral-large-2512"}
+  - {id: mistral-medium-3.5, vendor: Mistral, tokenizer: mistral-medium-3.5, input: 1.50, output: 7.50, context: 262144,
+     source: "https://openrouter.ai/api/v1/models"}
+
+  # --- Z.ai (first-party)
+  - {id: glm-5, vendor: Z.ai, tokenizer: glm-5, input: 1.00, output: 3.20, context: 204800,
+     source: "https://docs.z.ai/guides/overview/pricing", context_source: "https://openrouter.ai/api/v1/models"}
+
+  # --- Open-weight models, priced via OpenRouter
+  - {id: llama-4-maverick, vendor: Meta, tokenizer: llama-4, input: 0.188, output: 0.652, context: 524288,
+     source: "https://openrouter.ai/api/v1/models"}
+  - {id: llama-3.3-70b, vendor: Meta, tokenizer: llama-3, input: 0.10, output: 0.32, context: 131072,
+     source: "https://openrouter.ai/api/v1/models"}
+  - {id: qwen3.5-397b-a17b, vendor: Alibaba, tokenizer: qwen-3.5, input: 0.50, output: 3.60, context: 262144,
+     source: "https://openrouter.ai/api/v1/models"}
+  - {id: qwen3-235b-a22b-2507, vendor: Alibaba, tokenizer: qwen-3, input: 0.09, output: 0.55, context: 262144,
+     source: "https://openrouter.ai/api/v1/models"}
+  - {id: gemma-4-31b, vendor: Google, tokenizer: gemma-4, input: 0.20, output: 0.40, context: 262144,
+     source: "https://openrouter.ai/api/v1/models"}
+  - {id: phi-4, vendor: Microsoft, tokenizer: phi-4, input: 0.07, output: 0.14, context: 16384,
+     source: "https://openrouter.ai/api/v1/models"}
+
+  # --- Slots that need an API key to measure. Prices left blank on purpose: without a
+  # measured token count, a price would invite exactly the estimate we refuse to make.
+  - {id: claude, vendor: Anthropic, tokenizer: anthropic-claude, input: null, output: null, context: null,
+     source: null, note: "set ANTHROPIC_API_KEY and run `python -m tokentax.measure --api`"}
+  - {id: gemini, vendor: Google, tokenizer: google-gemini, input: null, output: null, context: null,
+     source: null, note: "set GEMINI_API_KEY and run `python -m tokentax.measure --api`"}
+  - {id: gpt-6, vendor: OpenAI, tokenizer: null, input: 2.00, output: 10.00, context: 1050000,
+     source: "https://developers.openai.com/api/docs/pricing",
+     note: "gpt-6-sol price shown; tokenizer not in tiktoken 0.14, so not measured"}

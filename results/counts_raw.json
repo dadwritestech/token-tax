@@ -1,0 +1,497 @@
+{
+ "counts": {
+  "openai-o200k": {
+   "eng_Latn": 26878,
+   "tel_Telu": 51869,
+   "hin_Deva": 42301,
+   "tam_Taml": 53207,
+   "ben_Beng": 45613,
+   "urd_Arab": 44423,
+   "mar_Deva": 48973,
+   "guj_Gujr": 48148,
+   "kan_Knda": 52979,
+   "mal_Mlym": 52604,
+   "pan_Guru": 70361,
+   "ory_Orya": 133998,
+   "sin_Sinh": 72434,
+   "npi_Deva": 43402,
+   "amh_Ethi": 156283,
+   "tir_Ethi": 161326,
+   "swh_Latn": 39933,
+   "yor_Latn": 58240,
+   "hau_Latn": 41664,
+   "zul_Latn": 46245,
+   "ibo_Latn": 44772,
+   "som_Latn": 46331,
+   "arb_Arab": 37123,
+   "pes_Arab": 41137,
+   "heb_Hebr": 39869,
+   "tha_Thai": 53488,
+   "mya_Mymr": 85034,
+   "khm_Khmr": 89682,
+   "lao_Laoo": 221170,
+   "vie_Latn": 40035,
+   "ind_Latn": 33586,
+   "tgl_Latn": 45548,
+   "zho_Hans": 33584,
+   "jpn_Jpan": 44562,
+   "kor_Hang": 39574,
+   "deu_Latn": 35247,
+   "fra_Latn": 36864,
+   "spa_Latn": 35416,
+   "por_Latn": 32933,
+   "ita_Latn": 39483,
+   "nld_Latn": 33517,
+   "pol_Latn": 44035,
+   "rus_Cyrl": 38191,
+   "ukr_Cyrl": 47006,
+   "tur_Latn": 38462,
+   "ell_Grek": 57522,
+   "kat_Geor": 47999,
+   "hye_Armn": 48054
+  },
+  "llama-3": {
+   "eng_Latn": 27176,
+   "tel_Telu": 225290,
+   "hin_Deva": 68644,
+   "tam_Taml": 207778,
+   "ben_Beng": 156463,
+   "urd_Arab": 84485,
+   "mar_Deva": 76641,
+   "guj_Gujr": 208291,
+   "kan_Knda": 240751,
+   "mal_Mlym": 242791,
+   "pan_Guru": 212283,
+   "ory_Orya": 330522,
+   "sin_Sinh": 234506,
+   "npi_Deva": 70393,
+   "amh_Ethi": 207121,
+   "tir_Ethi": 212241,
+   "swh_Latn": 52472,
+   "yor_Latn": 73950,
+   "hau_Latn": 53585,
+   "zul_Latn": 59421,
+   "ibo_Latn": 65227,
+   "som_Latn": 59438,
+   "arb_Arab": 44924,
+   "pes_Arab": 41382,
+   "heb_Hebr": 99039,
+   "tha_Thai": 60228,
+   "mya_Mymr": 316730,
+   "khm_Khmr": 237876,
+   "lao_Laoo": 238911,
+   "vie_Latn": 37814,
+   "ind_Latn": 41878,
+   "tgl_Latn": 55345,
+   "zho_Hans": 34847,
+   "jpn_Jpan": 41054,
+   "kor_Hang": 40446,
+   "deu_Latn": 43005,
+   "fra_Latn": 43527,
+   "spa_Latn": 41887,
+   "por_Latn": 40087,
+   "ita_Latn": 44516,
+   "nld_Latn": 43442,
+   "pol_Latn": 51379,
+   "rus_Cyrl": 43921,
+   "ukr_Cyrl": 44662,
+   "tur_Latn": 38116,
+   "ell_Grek": 60895,
+   "kat_Geor": 265070,
+   "hye_Armn": 235281
+  },
+  "gemma-4": {
+   "eng_Latn": 28125,
+   "tel_Telu": 49175,
+   "hin_Deva": 36548,
+   "tam_Taml": 40841,
+   "ben_Beng": 33847,
+   "urd_Arab": 42175,
+   "mar_Deva": 39027,
+   "guj_Gujr": 51454,
+   "kan_Knda": 53262,
+   "mal_Mlym": 51124,
+   "pan_Guru": 74056,
+   "ory_Orya": 96210,
+   "sin_Sinh": 63077,
+   "npi_Deva": 42460,
+   "amh_Ethi": 53563,
+   "tir_Ethi": 68143,
+   "swh_Latn": 45446,
+   "yor_Latn": 66244,
+   "hau_Latn": 47900,
+   "zul_Latn": 54570,
+   "ibo_Latn": 59759,
+   "som_Latn": 53385,
+   "arb_Arab": 40896,
+   "pes_Arab": 40515,
+   "heb_Hebr": 48006,
+   "tha_Thai": 44657,
+   "mya_Mymr": 66306,
+   "khm_Khmr": 75137,
+   "lao_Laoo": 72040,
+   "vie_Latn": 38200,
+   "ind_Latn": 32291,
+   "tgl_Latn": 50562,
+   "zho_Hans": 30254,
+   "jpn_Jpan": 33908,
+   "kor_Hang": 38279,
+   "deu_Latn": 37031,
+   "fra_Latn": 39290,
+   "spa_Latn": 36178,
+   "por_Latn": 35103,
+   "ita_Latn": 38324,
+   "nld_Latn": 38520,
+   "pol_Latn": 41863,
+   "rus_Cyrl": 38034,
+   "ukr_Cyrl": 44669,
+   "tur_Latn": 38170,
+   "ell_Grek": 60341,
+   "kat_Geor": 63231,
+   "hye_Armn": 78029
+  }
+ },
+ "languages": {
+  "eng_Latn": {
+   "name": "English",
+   "script": "Latin",
+   "spaced": true,
+   "words": 21901,
+   "chars": 111077
+  },
+  "tel_Telu": {
+   "name": "Telugu",
+   "script": "Telugu",
+   "spaced": true,
+   "words": 16938,
+   "chars": 116300
+  },
+  "hin_Deva": {
+   "name": "Hindi",
+   "script": "Devanagari",
+   "spaced": true,
+   "words": 25643,
+   "chars": 106543
+  },
+  "tam_Taml": {
+   "name": "Tamil",
+   "script": "Tamil",
+   "spaced": true,
+   "words": 16775,
+   "chars": 138268
+  },
+  "ben_Beng": {
+   "name": "Bengali",
+   "script": "Bengali",
+   "spaced": true,
+   "words": 19506,
+   "chars": 111817
+  },
+  "urd_Arab": {
+   "name": "Urdu",
+   "script": "Arabic",
+   "spaced": true,
+   "words": 27653,
+   "chars": 103272
+  },
+  "mar_Deva": {
+   "name": "Marathi",
+   "script": "Devanagari",
+   "spaced": true,
+   "words": 19046,
+   "chars": 114936
+  },
+  "guj_Gujr": {
+   "name": "Gujarati",
+   "script": "Gujarati",
+   "spaced": true,
+   "words": 20886,
+   "chars": 106442
+  },
+  "kan_Knda": {
+   "name": "Kannada",
+   "script": "Kannada",
+   "spaced": true,
+   "words": 16100,
+   "chars": 122562
+  },
+  "mal_Mlym": {
+   "name": "Malayalam",
+   "script": "Malayalam",
+   "spaced": true,
+   "words": 14930,
+   "chars": 135343
+  },
+  "pan_Guru": {
+   "name": "Punjabi",
+   "script": "Gurmukhi",
+   "spaced": true,
+   "words": 25906,
+   "chars": 109699
+  },
+  "ory_Orya": {
+   "name": "Odia",
+   "script": "Odia",
+   "spaced": true,
+   "words": 19620,
+   "chars": 116540
+  },
+  "sin_Sinh": {
+   "name": "Sinhala",
+   "script": "Sinhala",
+   "spaced": true,
+   "words": 20708,
+   "chars": 111307
+  },
+  "npi_Deva": {
+   "name": "Nepali",
+   "script": "Devanagari",
+   "spaced": true,
+   "words": 18701,
+   "chars": 109209
+  },
+  "amh_Ethi": {
+   "name": "Amharic",
+   "script": "Ge'ez",
+   "spaced": true,
+   "words": 17330,
+   "chars": 70814
+  },
+  "tir_Ethi": {
+   "name": "Tigrinya",
+   "script": "Ge'ez",
+   "spaced": true,
+   "words": 19380,
+   "chars": 72332
+  },
+  "swh_Latn": {
+   "name": "Swahili",
+   "script": "Latin",
+   "spaced": true,
+   "words": 21291,
+   "chars": 117825
+  },
+  "yor_Latn": {
+   "name": "Yoruba",
+   "script": "Latin",
+   "spaced": true,
+   "words": 25206,
+   "chars": 101228
+  },
+  "hau_Latn": {
+   "name": "Hausa",
+   "script": "Latin",
+   "spaced": true,
+   "words": 25156,
+   "chars": 115923
+  },
+  "zul_Latn": {
+   "name": "Zulu",
+   "script": "Latin",
+   "spaced": true,
+   "words": 15826,
+   "chars": 133548
+  },
+  "ibo_Latn": {
+   "name": "Igbo",
+   "script": "Latin",
+   "spaced": true,
+   "words": 24917,
+   "chars": 110542
+  },
+  "som_Latn": {
+   "name": "Somali",
+   "script": "Latin",
+   "spaced": true,
+   "words": 23322,
+   "chars": 129346
+  },
+  "arb_Arab": {
+   "name": "Arabic",
+   "script": "Arabic",
+   "spaced": true,
+   "words": 19637,
+   "chars": 97682
+  },
+  "pes_Arab": {
+   "name": "Persian",
+   "script": "Arabic",
+   "spaced": true,
+   "words": 23528,
+   "chars": 101311
+  },
+  "heb_Hebr": {
+   "name": "Hebrew",
+   "script": "Hebrew",
+   "spaced": true,
+   "words": 17368,
+   "chars": 85681
+  },
+  "tha_Thai": {
+   "name": "Thai",
+   "script": "Thai",
+   "spaced": false,
+   "words": 4303,
+   "chars": 122818
+  },
+  "mya_Mymr": {
+   "name": "Burmese",
+   "script": "Myanmar",
+   "spaced": false,
+   "words": 10642,
+   "chars": 153497
+  },
+  "khm_Khmr": {
+   "name": "Khmer",
+   "script": "Khmer",
+   "spaced": false,
+   "words": 5815,
+   "chars": 148409
+  },
+  "lao_Laoo": {
+   "name": "Lao",
+   "script": "Lao",
+   "spaced": false,
+   "words": 6058,
+   "chars": 125014
+  },
+  "vie_Latn": {
+   "name": "Vietnamese",
+   "script": "Latin",
+   "spaced": true,
+   "words": 30725,
+   "chars": 108882
+  },
+  "ind_Latn": {
+   "name": "Indonesian",
+   "script": "Latin",
+   "spaced": true,
+   "words": 19811,
+   "chars": 123517
+  },
+  "tgl_Latn": {
+   "name": "Tagalog",
+   "script": "Latin",
+   "spaced": true,
+   "words": 26769,
+   "chars": 140411
+  },
+  "zho_Hans": {
+   "name": "Chinese (Simplified)",
+   "script": "Han",
+   "spaced": false,
+   "words": 2069,
+   "chars": 42191
+  },
+  "jpn_Jpan": {
+   "name": "Japanese",
+   "script": "Kana/Kanji",
+   "spaced": false,
+   "words": 1081,
+   "chars": 56874
+  },
+  "kor_Hang": {
+   "name": "Korean",
+   "script": "Hangul",
+   "spaced": true,
+   "words": 15430,
+   "chars": 51543
+  },
+  "deu_Latn": {
+   "name": "German",
+   "script": "Latin",
+   "spaced": true,
+   "words": 21760,
+   "chars": 133053
+  },
+  "fra_Latn": {
+   "name": "French",
+   "script": "Latin",
+   "spaced": true,
+   "words": 25618,
+   "chars": 133030
+  },
+  "spa_Latn": {
+   "name": "Spanish",
+   "script": "Latin",
+   "spaced": true,
+   "words": 26081,
+   "chars": 131928
+  },
+  "por_Latn": {
+   "name": "Portuguese",
+   "script": "Latin",
+   "spaced": true,
+   "words": 23413,
+   "chars": 121007
+  },
+  "ita_Latn": {
+   "name": "Italian",
+   "script": "Latin",
+   "spaced": true,
+   "words": 24311,
+   "chars": 132839
+  },
+  "nld_Latn": {
+   "name": "Dutch",
+   "script": "Latin",
+   "spaced": true,
+   "words": 22999,
+   "chars": 125520
+  },
+  "pol_Latn": {
+   "name": "Polish",
+   "script": "Latin",
+   "spaced": true,
+   "words": 19488,
+   "chars": 121007
+  },
+  "rus_Cyrl": {
+   "name": "Russian",
+   "script": "Cyrillic",
+   "spaced": true,
+   "words": 19655,
+   "chars": 123416
+  },
+  "ukr_Cyrl": {
+   "name": "Ukrainian",
+   "script": "Cyrillic",
+   "spaced": true,
+   "words": 19181,
+   "chars": 116268
+  },
+  "tur_Latn": {
+   "name": "Turkish",
+   "script": "Latin",
+   "spaced": true,
+   "words": 17609,
+   "chars": 119160
+  },
+  "ell_Grek": {
+   "name": "Greek",
+   "script": "Greek",
+   "spaced": true,
+   "words": 23899,
+   "chars": 134652
+  },
+  "kat_Geor": {
+   "name": "Georgian",
+   "script": "Georgian",
+   "spaced": true,
+   "words": 17200,
+   "chars": 127742
+  },
+  "hye_Armn": {
+   "name": "Armenian",
+   "script": "Armenian",
+   "spaced": true,
+   "words": 19301,
+   "chars": 127667
+  }
+ },
+ "meta": {
+  "corpus": "FLORES-200 devtest (1012 sentences)",
+  "cleaned": false,
+  "measured": "2026-10-30"
+ }
+}

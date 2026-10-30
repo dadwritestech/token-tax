@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>token-tax: the same paragraph costs more in your language</title>
+<style>
+.viz-root {
+  color-scheme: light;
+  --surface-0: #f4f3ef; --surface-1: #fcfcfb; --hair: #e4e2dc; --axis: #c9c7bf;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #77756f;
+  --series-1: #2a78d6; --accent: #e34948;
+  --seq-1: #cde2fb; --seq-2: #9ec5f4; --seq-3: #6da7ec; --seq-4: #3987e5; --seq-5: #256abf; --seq-6: #184f95; --seq-7: #0d366b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --surface-0: #121211; --surface-1: #1a1a19; --hair: #2c2c2a; --axis: #45443f;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #9a998f;
+    --series-1: #3987e5; --accent: #e66767;
+    --seq-1: #0d366b; --seq-2: #104281; --seq-3: #184f95; --seq-4: #256abf; --seq-5: #3987e5; --seq-6: #6da7ec; --seq-7: #b7d3f6;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-0); }
+.viz-root { font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text-primary); background: var(--surface-0); min-height: 100vh; }
+main { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
+h1 { font-size: 15px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary); margin: 0 0 8px; }
+h2 { font-size: 18px; margin: 0 0 4px; }
+p.sub { color: var(--text-secondary); margin: 0 0 16px; }
+.card { background: var(--surface-1); border: 1px solid var(--hair); border-radius: 12px; padding: 20px 22px; margin: 18px 0; }
+.hero { font-size: clamp(26px, 4.2vw, 44px); line-height: 1.15; font-weight: 650; letter-spacing: -0.01em; margin: 6px 0 14px; }
+.hero .num { font-variant-numeric: tabular-nums; }
+.hero .en { color: var(--text-secondary); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+.tile { border: 1px solid var(--hair); border-radius: 10px; padding: 10px 12px; }
+.tile .k { font-size: 12px; color: var(--text-secondary); }
+.tile .v { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.tile .s { font-size: 12px; color: var(--text-muted); }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 6px; }
+select, button { font: inherit; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--axis); border-radius: 8px; padding: 5px 10px; }
+button { cursor: pointer; }
+svg text { fill: var(--text-secondary); font-size: 12px; }
+svg .val { fill: var(--text-primary); font-variant-numeric: tabular-nums; }
+.tip { position: fixed; pointer-events: none; background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--axis); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 16px rgba(0,0,0,.12); display: none; z-index: 10; max-width: 300px; }
+.tip b { font-weight: 600; }
+.tip .row { display: flex; justify-content: space-between; gap: 14px; color: var(--text-secondary); }
+.tip .row span:last-child { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--text-secondary); font-weight: 600; }
+.scroll { overflow-x: auto; }
+.legend { display: flex; gap: 2px; align-items: center; font-size: 12px; color: var(--text-secondary); margin-top: 8px; flex-wrap: wrap; }
+.legend .sw { width: 34px; height: 10px; border-radius: 2px; }
+.legend .lab { margin: 0 8px 0 4px; }
+.foot { color: var(--text-muted); font-size: 13px; }
+a { color: var(--series-1); }
+.pending { color: var(--text-muted); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<main>
+  <h1>token-tax · measured, not estimated</h1>
+  <div class="card" id="hero-card">
+    <div class="controls">
+      <label for="tok">Tokenizer</label> <select id="tok"></select>
+      <a href="calculator.html" style="margin-left:auto">Paste your own text →</a>
+    </div>
+    <div class="hero" id="hero"></div>
+    <p class="sub" id="hero-sub"></p>
+    <div class="tiles" id="tiles"></div>
+  </div>
+
+  <div class="card">
+    <h2>Token premium per language</h2>
+    <p class="sub" id="bars-sub"></p>
+    <div id="bars"></div>
+  </div>
+
+  <div class="card">
+    <h2>Every tokenizer, every language</h2>
+    <p class="sub">Premium vs English on identical FLORES-200 content. Stronger contrast with the background = more expensive (see legend). Tokenizers sorted by geometric-mean premium (best first). Hover a cell.</p>
+    <div class="scroll"><div id="heat"></div></div>
+    <div class="legend" id="heat-legend"></div>
+  </div>
+
+  <div class="card">
+    <h2>What you pay, and how much fits</h2>
+    <p class="sub">Input price per 1M <em>English-equivalent</em> words (the same content), and how many English-equivalent words of Telugu content fit in each model's context window. Prices from <code>prices.yaml</code>, checked <span id="checked"></span>.</p>
+    <div class="scroll"><table id="models"></table></div>
+    <p class="foot" id="pending"></p>
+  </div>
+
+  <div class="card">
+    <h2>Table view</h2>
+    <p class="sub">Premium vs English for the selected tokenizer, with raw counts.</p>
+    <div class="scroll"><table id="tbl"></table></div>
+  </div>
+
+  <p class="foot" id="foot"></p>
+</main>
+<div class="tip" id="tip"></div>
+</div>
+<script src="data.js"></script>
+<script>
+const D = window.TOKEN_TAX, L = D.languages, EN = "eng_Latn";
+const TOKS = D.tokenizers, byId = Object.fromEntries(TOKS.map(t => [t.id, t]));
+const HEADLINE_LANGS = ["tel_Telu", "hin_Deva", "amh_Ethi", "mya_Mymr"];
+const fmt = (x, d = 2) => x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const usd = x => "$" + fmt(x);
+const tip = document.getElementById("tip");
+function showTip(e, html) { tip.innerHTML = html; tip.style.display = "block"; moveTip(e); }
+function moveTip(e) { const w = tip.offsetWidth, x = e.clientX + 14 + w > innerWidth ? e.clientX - w - 14 : e.clientX + 14; tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px"; }
+function hideTip() { tip.style.display = "none"; }
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, parent) { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+function label(t) { return t.label + (t.same_as.length ? " (same as " + t.same_as.join(", ") + ")" : ""); }
+
+const sel = document.getElementById("tok");
+TOKS.forEach(t => sel.add(new Option(label(t), t.id)));
+sel.value = location.hash.slice(1) && byId[location.hash.slice(1)] ? location.hash.slice(1) : "openai-o200k";
+sel.onchange = () => { location.hash = sel.value; render(); };
+
+function render() {
+  const t = byId[sel.value], P = t.premium;
+  // Hero
+  const parts = HEADLINE_LANGS.map(l => `<span class="num">${usd(P[l])}</span> in ${L[l].name}`);
+  document.getElementById("hero").innerHTML =
+    `The same paragraph costs <span class="en"><span class="num">$1.00</span> in English</span>, ${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}.`;
+  document.getElementById("hero-sub").textContent =
+    `${label(t)}. Token counts for the 1,012 FLORES-200 devtest sentences (identical meaning in every language), divided by the English count. Price per token is the same for every language, so the token premium is the price premium.`;
+  const w = t.worst, gm = t.geomean_premium;
+  const ctxT = 128000, ctxEn = ctxT * L[EN].words / t.tokens[EN], ctxTe = ctxT * L[EN].words / t.tokens.tel_Telu;
+  document.getElementById("tiles").innerHTML = [
+    ["Worst language", w.premium.toFixed(1) + "×", L[w.lang].name],
+    ["Typical tax", gm.toFixed(2) + "×", "geometric mean, 47 languages"],
+    ["A 128k window holds", Math.round(ctxEn / 1000) + "k", "words of English"],
+    ["…but only", Math.round(ctxTe / 1000) + "k", "English-equivalent words of Telugu content"],
+  ].map(([k, v, s]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("");
+  renderBars(t); renderTable(t);
+}
+
+function renderBars(t) {
+  const host = document.getElementById("bars"); host.innerHTML = "";
+  const langs = Object.keys(L).sort((a, b) => t.premium[b] - t.premium[a]);
+  const rowH = 18, gap = 2, padL = 150, padR = 56, top = 22, W = host.clientWidth || 1000;
+  const H = top + langs.length * (rowH + gap) + 8;
+  const max = Math.max(...langs.map(l => t.premium[l]));
+  const x = v => padL + (W - padL - padR) * v / max;
+  const svg = el("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Token premium per language" }, host);
+  // grid
+  const step = max > 8 ? 2 : 1;
+  for (let v = 0; v <= max; v += step) {
+    el("line", { x1: x(v), x2: x(v), y1: top - 4, y2: H - 6, stroke: "var(--hair)", "stroke-width": 1 }, svg);
+    el("text", { x: x(v), y: 12, "text-anchor": "middle" }, svg).textContent = v + "×";
+  }
+  langs.forEach((l, i) => {
+    const y = top + i * (rowH + gap), p = t.premium[l], isEn = l === EN;
+    el("text", { x: padL - 8, y: y + rowH - 5, "text-anchor": "end" }, svg).textContent = L[l].name;
+    const w = Math.max(2, x(p) - padL);
+    el("path", { d: `M${padL},${y} h${w - 4} a4,4 0 0 1 4,4 v${rowH - 8} a4,4 0 0 1 -4,4 h${-(w - 4)} z`,
+      fill: isEn ? "var(--text-muted)" : "var(--series-1)" }, svg);
+    el("text", { x: x(p) + 6, y: y + rowH - 5, class: "val" }, svg).textContent = p.toFixed(2) + "×";
+    const hit = el("rect", { x: 0, y: y - gap / 2, width: W, height: rowH + gap, fill: "transparent" }, svg);
+    hit.addEventListener("mousemove", e => showTip(e, tipHtml(t, l)));
+    hit.addEventListener("mouseleave", hideTip);
+  });
+  // 1x reference line
+  el("line", { x1: x(1), x2: x(1), y1: top - 4, y2: H - 6, stroke: "var(--text-primary)", "stroke-width": 1.5 }, svg);
+  document.getElementById("bars-sub").textContent =
+    `${label(t)}: how many times more tokens the same content needs than English (dark rule = English, 1×).`;
+}
+
+function tipHtml(t, l) {
+  const r = (k, v) => `<div class="row"><span>${k}</span><span>${v}</span></div>`;
+  return `<b>${L[l].name}</b> · ${t.label}` +
+    r("premium vs English", t.premium[l].toFixed(2) + "×") +
+    r("tokens (corpus)", t.tokens[l].toLocaleString()) +
+    r("tokens / word", L[l].spaced ? t.tokens_per_word[l].toFixed(2) : "n/a (no spaces)") +
+    r("tokens / char", t.tokens_per_char[l].toFixed(3)) +
+    r("English paragraph $1.00 →", usd(t.premium[l]));
+}
+
+const BINS = [1.25, 1.75, 2.5, 4, 6, 9];
+const binOf = v => { let i = 0; while (i < BINS.length && v >= BINS[i]) i++; return i; };
+function renderHeat() {
+  const host = document.getElementById("heat");
+  const langs = Object.keys(L).filter(l => l !== EN);
+  const gm = {}; langs.forEach(l => gm[l] = Math.exp(TOKS.reduce((s, t) => s + Math.log(t.premium[l]), 0) / TOKS.length));
+  langs.sort((a, b) => gm[b] - gm[a]);
+  const cell = 17, padL = 186, padT = 92;
+  const W = padL + langs.length * cell + 60, H = padT + TOKS.length * cell + 6;
+  const svg = el("svg", { width: W, height: H, role: "img", "aria-label": "Heatmap of token premium" }, host);
+  langs.forEach((l, j) => {
+    const tx = padL + j * cell + cell / 2;
+    el("text", { x: tx, y: padT - 6, transform: `rotate(-60 ${tx} ${padT - 6})` }, svg).textContent = L[l].name;
+  });
+  TOKS.forEach((t, i) => {
+    const y = padT + i * cell;
+    el("text", { x: padL - 8, y: y + cell - 6, "text-anchor": "end" }, svg).textContent = t.label.length > 26 ? t.label.slice(0, 25) + "…" : t.label;
+    langs.forEach((l, j) => {
+      const r = el("rect", { x: padL + j * cell, y, width: cell - 2, height: cell - 2, rx: 2,
+        fill: `var(--seq-${binOf(t.premium[l]) + 1})` }, svg);
+      r.addEventListener("mousemove", e => showTip(e, tipHtml(t, l)));
+      r.addEventListener("mouseleave", hideTip);
+      r.addEventListener("click", () => { sel.value = t.id; sel.onchange(); scrollTo({ top: 0, behavior: "smooth" }); });
+    });
+  });
+  const edges = ["<1.25×", "1.25–1.75", "1.75–2.5", "2.5–4", "4–6", "6–9", "≥9×"];
+  document.getElementById("heat-legend").innerHTML = edges.map((e, i) =>
+    `<span class="sw" style="background:var(--seq-${i + 1})"></span><span class="lab">${e}</span>`).join("");
+}
+
+function renderModels() {
+  document.getElementById("checked").textContent = D.meta.prices_checked;
+  const cols = ["eng_Latn", "tel_Telu", "hin_Deva", "tam_Taml", "amh_Ethi", "mya_Mymr"];
+  const rows = D.models.filter(m => m.usd_in_per_m_en_words);
+  let h = `<tr><th>model</th><th>tokenizer</th>${cols.map(l => `<th>${L[l].name}</th>`).join("")}<th>window</th><th>holds (English)</th><th>holds (Telugu)</th><th>source</th></tr>`;
+  for (const m of rows) {
+    const c = m.usd_in_per_m_en_words, cw = m.context_en_words;
+    h += `<tr><td>${m.id}</td><td>${m.tokenizer}</td>${cols.map(l => `<td>${usd(c[l])}</td>`).join("")}` +
+      `<td>${(m.context / 1000).toFixed(0)}k</td><td>${Math.round(cw[EN] / 1000)}k words</td><td>${Math.round(cw.tel_Telu / 1000)}k words</td>` +
+      `<td><a href="${m.source}">link</a></td></tr>`;
+  }
+  document.getElementById("models").innerHTML = h;
+  const pend = D.models.filter(m => !m.measured).map(m => `${m.vendor} ${m.id}`);
+  document.getElementById("pending").innerHTML = `<span class="pending">Not measured, deliberately not estimated: ${pend.join(", ")}. Claude and Gemini tokenizers are only reachable via their count-tokens APIs; GPT-6's tokenizer is not published in tiktoken.</span>`;
+}
+
+function renderTable(t) {
+  const langs = Object.keys(L).sort((a, b) => t.premium[b] - t.premium[a]);
+  let h = `<tr><th>language</th><th>premium</th><th>tokens</th><th>words</th><th>tokens/word</th><th>chars</th><th>tokens/char</th></tr>`;
+  for (const l of langs) h += `<tr><td>${L[l].name}</td><td>${t.premium[l].toFixed(2)}×</td><td>${t.tokens[l].toLocaleString()}</td><td>${L[l].words.toLocaleString()}</td><td>${L[l].spaced ? t.tokens_per_word[l].toFixed(2) : "—"}</td><td>${L[l].chars.toLocaleString()}</td><td>${t.tokens_per_char[l].toFixed(3)}</td></tr>`;
+  document.getElementById("tbl").innerHTML = h;
+}
+
+document.getElementById("foot").innerHTML = `Corpus: ${D.meta.corpus}, CSV-doubled quotes collapsed (changes counts by ≤0.1%). Measured ${D.meta.measured}. Tokenizers loaded from public tokenizer.json / tiktoken files; nothing here is an estimate. Data: FLORES-200 (CC BY-SA 4.0).`;
+render(); renderHeat(); renderModels();
+addEventListener("resize", () => renderBars(byId[sel.value]));
+</script>
+</body>
+</html>

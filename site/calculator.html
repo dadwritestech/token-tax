@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>token-tax calculator: what does your text cost everywhere?</title>
+<style>
+.viz-root {
+  color-scheme: light;
+  --surface-0: #f4f3ef; --surface-1: #fcfcfb; --hair: #e4e2dc; --axis: #c9c7bf;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #77756f;
+  --series-1: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --surface-0: #121211; --surface-1: #1a1a19; --hair: #2c2c2a; --axis: #45443f;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #9a998f;
+    --series-1: #3987e5;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+.viz-root { font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text-primary); background: var(--surface-0); min-height: 100vh; }
+main { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
+h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.sub { color: var(--text-secondary); margin: 0 0 14px; }
+.card { background: var(--surface-1); border: 1px solid var(--hair); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }
+textarea { width: 100%; min-height: 150px; font: 15px/1.5 system-ui, sans-serif; color: var(--text-primary); background: var(--surface-0); border: 1px solid var(--axis); border-radius: 8px; padding: 10px 12px; resize: vertical; }
+select, button { font: inherit; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--axis); border-radius: 8px; padding: 4px 10px; }
+button { cursor: pointer; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+.chips label { display: inline-flex; gap: 5px; align-items: center; border: 1px solid var(--hair); border-radius: 999px; padding: 2px 10px; font-size: 13px; cursor: pointer; }
+.muted { color: var(--text-muted); font-size: 13px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--text-secondary); font-weight: 600; }
+td.bar { width: 34%; text-align: left; }
+.b { height: 10px; border-radius: 0 4px 4px 0; background: var(--series-1); min-width: 2px; }
+.scroll { overflow-x: auto; }
+a { color: var(--series-1); }
+.stat { font-size: 13px; color: var(--text-secondary); }
+.stat b { color: var(--text-primary); font-size: 18px; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<main>
+  <a href="index.html">← token-tax charts</a>
+  <h1>Paste your text. See what it costs everywhere.</h1>
+  <p class="sub">Exact token counts from the real tokenizers, running in your browser. Your text never leaves the page; only the tokenizer files are downloaded (from esm.sh and the Hugging Face Hub, then cached).</p>
+
+  <div class="card">
+    <textarea id="text" placeholder="Paste a paragraph in any language…"></textarea>
+    <div class="row">
+      <span class="muted">Samples (FLORES-200, same meaning):</span>
+      <span id="samples"></span>
+    </div>
+    <div class="row">
+      <label for="lang">Text language (for the English-equivalent estimate):</label>
+      <select id="lang"></select>
+      <span class="stat" id="textstat"></span>
+    </div>
+    <div class="row chips" id="chips"></div>
+    <p class="muted">Large tokenizers (Gemma ≈ 30 MB, Llama 4 ≈ 27 MB) take a few seconds the first time.</p>
+  </div>
+
+  <div class="card">
+    <div class="scroll"><table id="out"></table></div>
+    <p class="muted" id="note"></p>
+  </div>
+</main>
+</div>
+<script src="data.js"></script>
+<script type="module">
+const D = window.TOKEN_TAX, L = D.languages, EN = "eng_Latn";
+const TOKS = D.tokenizers;
+const DEFAULT_ON = new Set(["openai-o200k", "openai-cl100k", "llama-3", "qwen-3.5", "gemma-4", "deepseek-v3", "mistral-tekken", "sarvam-1"]);
+const priced = id => D.models.filter(m => m.usd_in_per_m_en_words && (m.tokenizer === id || (TOKS.find(t => t.id === id)?.same_as || []).includes(m.tokenizer)));
+const loaded = {}, loading = {};
+let transformers, tiktokenLite;
+
+async function getCounter(t) {
+  if (loaded[t.id]) return loaded[t.id];
+  if (!loading[t.id]) loading[t.id] = (async () => {
+    const [kind, name] = [t.browser.slice(0, t.browser.indexOf(":")), t.browser.slice(t.browser.indexOf(":") + 1)];
+    if (kind === "tiktoken") {
+      tiktokenLite ??= await import("https://esm.sh/js-tiktoken@1.0.21/lite");
+      const ranks = (await import(`https://esm.sh/js-tiktoken@1.0.21/ranks/${name}`)).default;
+      const enc = new tiktokenLite.Tiktoken(ranks);
+      return s => enc.encode(s, [], []).length;
+    }
+    transformers ??= await import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.2");
+    transformers.env.allowLocalModels = false;
+    const tok = await transformers.AutoTokenizer.from_pretrained(name);
+    return s => tok.encode(s, { add_special_tokens: false }).length;
+  })();
+  loaded[t.id] = await loading[t.id];
+  return loaded[t.id];
+}
+
+const chips = document.getElementById("chips");
+for (const t of TOKS) {
+  const lab = document.createElement("label");
+  lab.innerHTML = `<input type="checkbox" value="${t.id}" ${DEFAULT_ON.has(t.id) ? "checked" : ""}> ${t.label}`;
+  chips.appendChild(lab);
+}
+chips.onchange = run;
+
+const langSel = document.getElementById("lang");
+Object.entries(L).sort((a, b) => a[1].name.localeCompare(b[1].name)).forEach(([c, v]) => langSel.add(new Option(v.name, c)));
+langSel.value = "tel_Telu"; langSel.onchange = run;
+
+const sampleHost = document.getElementById("samples");
+for (const [code, text] of Object.entries(D.samples)) {
+  const b = document.createElement("button"); b.textContent = L[code].name; b.style.marginRight = "4px";
+  b.onclick = () => { ta.value = text; langSel.value = code; run(); };
+  sampleHost.appendChild(b);
+}
+const ta = document.getElementById("text");
+ta.value = D.samples.tel_Telu;
+let timer; ta.oninput = () => { clearTimeout(timer); timer = setTimeout(run, 250); };
+
+const status = {};
+async function run() {
+  const text = ta.value, lang = langSel.value;
+  const on = TOKS.filter(t => chips.querySelector(`input[value="${t.id}"]`).checked);
+  document.getElementById("textstat").innerHTML = `<b>${text.trim() ? text.trim().split(/\s+/).length : 0}</b> words · <b>${[...text.replace(/\s/g, "")].length}</b> chars`;
+  const results = await Promise.all(on.map(async t => {
+    try { const n = (await getCounter(t))(text); return { t, n }; }
+    catch (e) { console.warn(t.id, e); return { t, err: String(e.message || e) }; }
+  }));
+  const ok = results.filter(r => r.n !== undefined);
+  const max = Math.max(1, ...ok.map(r => r.n)), min = Math.min(...ok.map(r => r.n));
+  let h = `<tr><th>tokenizer</th><th>tokens</th><th class="bar"></th><th>vs fewest</th><th>same content in English ≈</th><th>your language's tax (FLORES)</th><th>cost of 1M such texts (input)</th></tr>`;
+  for (const r of results.sort((a, b) => (a.n ?? 1e12) - (b.n ?? 1e12))) {
+    if (r.err) { h += `<tr><td>${r.t.label}</td><td colspan="6" class="muted">could not load in browser: ${r.err.slice(0, 80)}</td></tr>`; continue; }
+    const prem = r.t.premium[lang], enEq = r.n / prem;
+    const costs = priced(r.t.id).map(m => `${m.id} $${(r.n * m.input).toFixed(2)}`).join(" · ") || "—";
+    h += `<tr><td>${r.t.label}</td><td>${r.n.toLocaleString()}</td><td class="bar"><div class="b" style="width:${(100 * r.n / max).toFixed(1)}%"></div></td>` +
+      `<td>${(r.n / min).toFixed(2)}×</td><td>${lang === EN ? "—" : Math.round(enEq).toLocaleString() + " tok"}</td><td>${prem.toFixed(2)}×</td><td style="text-align:left;white-space:normal;min-width:220px">${costs}</td></tr>`;
+  }
+  document.getElementById("out").innerHTML = h;
+  document.getElementById("note").textContent =
+    `"Same content in English" divides your count by the ${L[lang].name} premium measured on FLORES-200 for that tokenizer; it is an estimate for your text, the premium itself is measured. ` +
+    `"1M such texts" = tokens × input $/1M tokens from prices.yaml (checked ${D.meta.prices_checked}). Claude and Gemini need API keys and are not shown.`;
+}
+run();
+</script>
+</body>
+</html>
